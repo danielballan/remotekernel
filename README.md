@@ -1,10 +1,10 @@
 remotekernel
 ============
 
-an alternative approach to running Jupyter notebook kernels on remote machines
-with jupyter or jupyterhub
+With Jupyter or Jupyterhub, run kernels on remote machines.
 
-See also https://github.com/korniichuk/rk
+For another approach to the same problem, see also
+https://github.com/korniichuk/rk
 
 # Install
 
@@ -29,8 +29,8 @@ installed in that environment.
 
 # Run
 
-First, make sure that the user running ipython, jupyter, or jupyterhub can ssh
-into the remote machine without a password.
+First, make sure that the user who will run ipython, jupyter, or jupyterhub
+can ssh into the remote machine without a password. Then:
 
 ```
 ipython notebook --MappingKernelManager.kernel_manager_class=remotekernel.manager.RemoteIOLoopKernelManager

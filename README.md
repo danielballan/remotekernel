@@ -46,6 +46,6 @@ ipython notebook --MappingKernelManager.kernel_manager_class=remotekernel.manage
 To use with Jupyterhub, add the following lines to `jupyterhub_config.py`.
 
 ```
-Spawner.cmd = ['jupyterhub-singleuser', '--MappingKernelManager.kernel_manager_class=remotekernel.manager.RemoteIOLoopKernelManager']
+c.Spawner.cmd = ['jupyterhub-singleuser', '--MappingKernelManager.kernel_manager_class=remotekernel.manager.RemoteIOLoopKernelManager']
 c.Spawner.env_keep.append('SSH_AUTH_SOCK')
 ```

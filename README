@@ -1,0 +1,19 @@
+remotekernel
+============
+
+an alternative approach to spawning IPython kernels on remote machines
+with jupyterhub
+
+See also https://github.com/korniichuk/rk
+
+# Install
+
+```
+pip3 install remotekernel
+```
+
+# Setup
+
+```
+Spawner.cmd = ['jupyterhub-singleuser', '--MappingKernelManager.kernel_manager_class=remotekernel.manager.RemoteIOLoopKernelManager']
+```

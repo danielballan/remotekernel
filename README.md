@@ -9,7 +9,7 @@ https://github.com/korniichuk/rk
 ## Install
 
 ```
-pip3 install remotekernel
+pip3 install https://github.com/danielballan/remotekernel/zipball/master
 ```
 
 ## Make Kernels

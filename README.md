@@ -16,10 +16,16 @@ pip3 install remotekernel
 
 To make a kernel that will be run on a remote host, add a `host` field to the `kernel.json`.
 
-{"argv":["/home/dallan/mc/envs/py3/bin/python", "-m", "IPython.kernel", "-f", "{connection_file}"],
+```
+{"argv":["python", "-m", "IPython.kernel", "-f", "{connection_file}"],
  "display_name":"Python 3 on Remote",
   "host":"danallan.com"
 }
+```
+
+It is also useful to map the first argument (`python`) to a specific Python
+in, say, a conda environment. IPython and the notebook dependencies must be
+installed in that environment.
 
 # Run
 

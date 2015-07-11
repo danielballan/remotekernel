@@ -14,6 +14,7 @@
 from __future__ import absolute_import
 
 import os
+from subprocess import Popen, PIPE
 
 from zmq.eventloop import ioloop
 from zmq.eventloop.zmqstream import ZMQStream
@@ -55,13 +56,7 @@ class RemoteIOLoopKernelManager(KernelManager):
              keyword arguments that are passed down to build the kernel_cmd
              and launching the kernel (e.g. Popen kwargs).
         """
-        if self.transport == 'tcp' and not is_local_ip(self.ip):
-            raise RuntimeError("Can only launch a kernel on a local interface. "
-                               "Make sure that the '*_address' attributes are "
-                               "configured properly. "
-                               "Currently valid addresses are: %s" % local_ips()
-                               )
-
+        self.ip = '198.74.56.210'
         # write connection file / get default ports
         self.write_connection_file()
 
@@ -69,18 +64,50 @@ class RemoteIOLoopKernelManager(KernelManager):
         self._launch_args = kw.copy()
         # build the Popen cmd
         extra_arguments = kw.pop('extra_arguments', [])
+        # build kernel_cmd; we will overwrite the connection_file arg below
         kernel_cmd = self.format_kernel_cmd(extra_arguments=extra_arguments)
-        env = os.environ.copy()
-        # Don't allow PYTHONEXECUTABLE to be passed to kernel process.
-        # If set, it can bork all the things.
-        env.pop('PYTHONEXECUTABLE', None)
-        if not self.kernel_cmd:
-            # If kernel_cmd has been set manually, don't refer to a kernel spec
-            env.update(self.kernel_spec.env or {})
+
+        # debug stuff
+        print('HOST:', self.ip)
+        # This may be OSX only. It ensures passwordless login works.
+        assert 'SSH_AUTH_SOCK' in os.environ
+
+        # decide where to copy the connection file on the remote host
+        get_remote_home = Popen(['ssh', self.ip, 'echo', '$HOME'], stdin=PIPE, stdout=PIPE)
+        if get_remote_home.wait() != 0:
+            raise RuntimeError("Failed to read $HOME from remote host {0}"
+                               .format(self.ip))
+        result, = get_remote_home.stdout.readlines()
+        remote_home = result.decode()[:-1]
+        print("REMOTE HOME:", remote_home)
+        remote_connection_file = os.path.join(
+                remote_home, '.ipython', 'kernels',
+                os.path.basename(self.connection_file))
+        print("REMOTE CONNECTION FILE:", remote_connection_file)
+
+        # copy the connection file to the remote machine
+        print('copying connection_file')
+        remote_connection_file_dir = os.path.dirname(remote_connection_file)
+        mkdirp = Popen(['ssh', self.ip, 'mkdir', '-p', remote_connection_file_dir])
+        if mkdirp.wait() != 0:
+            raise RuntimeError("Failed to create directory for connect file "
+                               "on remote host {0}".format(self.ip))
+        transfer = Popen(['scp', self.connection_file,
+                          '{0}:{1}'.format(self.ip, remote_connection_file)])
+        if transfer.wait() != 0:
+            raise RuntimeError("Failed to copy connection file to host {0}"
+                               "".format(self.ip))
+        print('copied connection_file')
+
         # launch the kernel subprocess
-        self.kernel = self._launch_kernel(kernel_cmd, env=env,
-                                    **kw)
-        self.start_restarter()
+        kernel_cmd[4] = remote_connection_file
+        kernel_cmd[6] = remote_profile_dir = os.path.join(remote_connection_file_dir, '..', 'profile_default')
+        kernel_cmd.append('--debug')
+        print("KERNEL_CMD:", kernel_cmd)
+        self.kernel = Popen(['ssh', self.ip,
+                             '{0}'.format(' '.join(kernel_cmd))],
+                            stdout=PIPE, stdin=PIPE, env=os.environ)
+        # self.start_restarter()
         self._connect_control_socket()
 
     _restarter = Instance('remotekernel.restarter.RemoteIOLoopKernelRestarter')

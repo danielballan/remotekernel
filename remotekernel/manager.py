@@ -14,6 +14,7 @@
 from __future__ import absolute_import
 
 import os
+import socket
 from subprocess import Popen, PIPE
 
 from zmq.eventloop import ioloop
@@ -56,7 +57,7 @@ class RemoteIOLoopKernelManager(KernelManager):
              keyword arguments that are passed down to build the kernel_cmd
              and launching the kernel (e.g. Popen kwargs).
         """
-        self.ip = '198.74.56.210'
+        self.ip = socket.gethostbyname(self.kernel_spec.host)
         # write connection file / get default ports
         self.write_connection_file()
 

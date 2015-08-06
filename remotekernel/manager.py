@@ -101,8 +101,10 @@ class RemoteIOLoopKernelManager(KernelManager):
         print('copied connection_file')
 
         # launch the kernel subprocess
+        print("KERNEL__CMD BEFORE EDITING", kernel_cmd)
         kernel_cmd[4] = remote_connection_file
-        kernel_cmd[6] = remote_profile_dir = os.path.join(remote_connection_file_dir, '..', 'profile_default')
+        if len(kernel_cmd) > 6:
+            kernel_cmd[6] = remote_profile_dir = os.path.join(remote_connection_file_dir, '..', 'profile_default')
         kernel_cmd.append('--debug')
         print("KERNEL_CMD:", kernel_cmd)
         self.kernel = Popen(['ssh', self.ip,

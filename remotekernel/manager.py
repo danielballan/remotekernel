@@ -72,7 +72,6 @@ class RemoteIOLoopKernelManager(KernelManager):
 
         # debug stuff
         # This may be OSX only. It ensures passwordless login works.
-        assert 'SSH_AUTH_SOCK' in os.environ
 
         # decide where to copy the connection file on the remote host
         get_remote_home = Popen(['ssh', self.ip, 'echo', '$HOME'], stdin=PIPE, stdout=PIPE)

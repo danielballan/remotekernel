@@ -76,8 +76,8 @@ class RemoteIOLoopKernelManager(KernelManager):
         # decide where to copy the connection file on the remote host
         get_remote_home = Popen(['ssh', self.ip, 'echo', '$HOME'], stdin=PIPE, stdout=PIPE)
         if get_remote_home.wait() != 0:
-            raise RuntimeError("Failed to read $HOME from remote host {0}"
-                               .format(self.ip))
+            raise RuntimeError("Failed to connect to remote host {0}"
+                               "".format(self.ip))
         result, = get_remote_home.stdout.readlines()
         remote_home = result.decode()[:-1]
         remote_connection_file = os.path.join(
@@ -88,8 +88,8 @@ class RemoteIOLoopKernelManager(KernelManager):
         remote_connection_file_dir = os.path.dirname(remote_connection_file)
         mkdirp = Popen(['ssh', self.ip, 'mkdir', '-p', remote_connection_file_dir])
         if mkdirp.wait() != 0:
-            raise RuntimeError("Failed to create directory for connect file "
-                               "on remote host {0}".format(self.ip))
+            raise RuntimeError("Failed to create directory for connection "
+                               "file on remote host {0}".format(self.ip))
         transfer = Popen(['scp', self.connection_file,
                           '{0}:{1}'.format(self.ip, remote_connection_file)])
         if transfer.wait() != 0:

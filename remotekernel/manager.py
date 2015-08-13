@@ -71,7 +71,6 @@ class RemoteIOLoopKernelManager(KernelManager):
         kernel_cmd = self.format_kernel_cmd(extra_arguments=extra_arguments)
 
         # debug stuff
-        print('HOST:', self.ip)
         # This may be OSX only. It ensures passwordless login works.
         assert 'SSH_AUTH_SOCK' in os.environ
 
@@ -82,14 +81,11 @@ class RemoteIOLoopKernelManager(KernelManager):
                                .format(self.ip))
         result, = get_remote_home.stdout.readlines()
         remote_home = result.decode()[:-1]
-        print("REMOTE HOME:", remote_home)
         remote_connection_file = os.path.join(
                 remote_home, '.ipython', 'kernels',
                 os.path.basename(self.connection_file))
-        print("REMOTE CONNECTION FILE:", remote_connection_file)
 
         # copy the connection file to the remote machine
-        print('copying connection_file')
         remote_connection_file_dir = os.path.dirname(remote_connection_file)
         mkdirp = Popen(['ssh', self.ip, 'mkdir', '-p', remote_connection_file_dir])
         if mkdirp.wait() != 0:
@@ -100,12 +96,10 @@ class RemoteIOLoopKernelManager(KernelManager):
         if transfer.wait() != 0:
             raise RuntimeError("Failed to copy connection file to host {0}"
                                "".format(self.ip))
-        print('copied connection_file')
 
         # launch the kernel subprocess
         kernel_cmd[1 + kernel_cmd.index('-f')] = remote_connection_file
         kernel_cmd.append('--debug')
-        print("KERNEL_CMD:", kernel_cmd)
         self.kernel = Popen(['ssh', self.ip,
                              '{0}'.format(' '.join(kernel_cmd))],
                             stdout=PIPE, stdin=PIPE, env=os.environ)

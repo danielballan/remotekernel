@@ -49,7 +49,7 @@ First, make sure that the user who will run ipython, jupyter, or jupyterhub
 can ssh into the remote machine without a password. Then:
 
 ```
-ipython notebook --MappingKernelManager.kernel_manager_class=remotekernel.manager.RemoteIOLoopKernelManager
+jupyter notebook --MappingKernelManager.kernel_manager_class=remotekernel.manager.RemoteIOLoopKernelManager
 ```
 
 ## Jupyterhub Configuration

@@ -42,6 +42,8 @@ def as_zmqstream(f):
 class RemoteIOLoopKernelManager(KernelManager):
 
     loop = Instance('zmq.eventloop.ioloop.IOLoop', allow_none=False)
+    # _restarter = Instance('remotekernel.restarter.RemoteIOLoopKernelRestarter')
+
     def _loop_default(self):
         return ioloop.IOLoop.instance()
 
@@ -110,8 +112,6 @@ class RemoteIOLoopKernelManager(KernelManager):
                             stdout=PIPE, stdin=PIPE, env=os.environ)
         # self.start_restarter()
         self._connect_control_socket()
-
-    _restarter = Instance('remotekernel.restarter.RemoteIOLoopKernelRestarter')
 
     def start_restarter(self):
         if self.autorestart and self.has_kernel:

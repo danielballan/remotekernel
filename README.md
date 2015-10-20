@@ -29,8 +29,19 @@ To make a kernel that will be run on a remote host, add a `host` field to the
 The host can be a hostname, as in the example above, or an IP address.
 
 It is also useful to map the first argument (`python`) to a specific Python
-in, say, a conda environment. IPython and the notebook dependencies must be
-installed in that environment.
+in, say, a conda environment. IPython (or ipykernel) and the notebook
+dependencies must be installed in that environment. The environment can be
+activated first so that any activation scripts are run.
+
+
+```
+{"argv":["source", "/opt/conda/bin/activate", "/opt/conda_envs/my_env",
+         "/opt/conda_envs/my_env/bin/python",
+         "-m", "IPython.kernel", "-f", "{connection_file}"],
+ "display_name":"Python 3 on Remote",
+ "host":"danallan.com"
+}
+```
 
 ## Run
 

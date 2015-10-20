@@ -20,13 +20,11 @@ from subprocess import Popen, PIPE
 from zmq.eventloop import ioloop
 from zmq.eventloop.zmqstream import ZMQStream
 
-from IPython.utils.traitlets import (
-    Instance
-)
-from IPython.utils.localinterfaces import is_local_ip, local_ips
+from traitlets import Instance
+from jupyter_client.localinterfaces import is_local_ip, local_ips
 
-from IPython.kernel.manager import KernelManager
-from .restarter import RemoteIOLoopKernelRestarter
+from jupyter_client.manager import KernelManager
+from jupyter_client.ioloop.restarter import IOLoopKernelRestarter
 
 #-----------------------------------------------------------------------------
 # Code
@@ -107,10 +105,12 @@ class RemoteIOLoopKernelManager(KernelManager):
         # self.start_restarter()
         self._connect_control_socket()
 
+    _restarter = Instance('jupyter_client.ioloop.IOLoopKernelRestarter', allow_none=True)
+
     def start_restarter(self):
         if self.autorestart and self.has_kernel:
             if self._restarter is None:
-                self._restarter = RemoteIOLoopKernelRestarter(
+                self._restarter = IOLoopKernelRestarter(
                     kernel_manager=self, loop=self.loop,
                     parent=self, log=self.log
                 )

@@ -35,7 +35,7 @@ activated first so that any activation scripts are run.
 
 
 ```
-{"argv":["source", "/opt/conda/bin/activate", "/opt/conda_envs/my_env",
+{"argv":["source", "/opt/conda/bin/activate", "/opt/conda_envs/my_env", "&&",
          "/opt/conda_envs/my_env/bin/python",
          "-m", "IPython.kernel", "-f", "{connection_file}"],
  "display_name":"Python 3 on Remote",

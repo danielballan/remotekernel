@@ -1,4 +1,4 @@
-from jupyter_client.kernel_spec import KernelSpec
+from jupyter_client.kernelspec import KernelSpec
 from trailets import Unicode
 
 class RemoteKernelSpec(KernelSpec):

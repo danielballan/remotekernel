@@ -1,5 +1,5 @@
 from jupyter_client.kernelspec import KernelSpec
-from trailets import Unicode
+from traitlets import Unicode
 
 class RemoteKernelSpec(KernelSpec):
     host = Unicode()

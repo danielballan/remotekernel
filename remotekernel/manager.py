@@ -68,7 +68,6 @@ class RemoteIOLoopKernelManager(KernelManager):
         # build kernel_cmd; we will overwrite the connection_file arg below
         kernel_cmd = self.format_kernel_cmd(extra_arguments=extra_arguments)
 
-        # debug stuff
         # This may be OSX only. It ensures passwordless login works.
 
         # decide where to copy the connection file on the remote host
@@ -96,9 +95,6 @@ class RemoteIOLoopKernelManager(KernelManager):
 
         # launch the kernel subprocess
         kernel_cmd[1 + kernel_cmd.index('-f')] = remote_connection_file
-        # if len(kernel_cmd) > 6:
-        #     kernel_cmd[6] = remote_profile_dir = os.path.join(remote_connection_file_dir, '..', 'profile_default')
-        kernel_cmd.append('--debug')
         self.kernel = Popen(['ssh', self.ip,
                              '{0}'.format(' '.join(kernel_cmd))],
                             stdout=PIPE, stdin=PIPE, env=os.environ)

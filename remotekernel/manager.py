@@ -68,8 +68,6 @@ class RemoteIOLoopKernelManager(KernelManager):
         # build kernel_cmd; we will overwrite the connection_file arg below
         kernel_cmd = self.format_kernel_cmd(extra_arguments=extra_arguments)
 
-        # This may be OSX only. It ensures passwordless login works.
-
         # decide where to copy the connection file on the remote host
         get_remote_home = Popen(['ssh', self.ip, 'echo', '$HOME'], stdin=PIPE, stdout=PIPE)
         if get_remote_home.wait() != 0:

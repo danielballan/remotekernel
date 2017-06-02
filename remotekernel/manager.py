@@ -69,14 +69,12 @@ class RemoteIOLoopKernelManager(KernelManager):
         kernel_cmd = self.format_kernel_cmd(extra_arguments=extra_arguments)
 
         # decide where to copy the connection file on the remote host
-        get_remote_home = Popen(['ssh', self.ip, 'echo', '$HOME'], stdin=PIPE, stdout=PIPE)
-        if get_remote_home.wait() != 0:
+        try_ssh = Popen(['ssh', self.ip, 'exit'], stdin=PIPE, stdout=PIPE)
+        if try_ssh.wait() != 0:
             raise RuntimeError("Failed to connect to remote host {0}"
                                "".format(self.ip))
-        result, = get_remote_home.stdout.readlines()
-        remote_home = result.decode()[:-1]
         remote_connection_file = os.path.join(
-                remote_home, '.ipython', 'kernels',
+                '~', '.ipython', 'kernels',
                 os.path.basename(self.connection_file))
 
         # copy the connection file to the remote machine

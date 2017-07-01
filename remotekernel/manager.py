@@ -70,9 +70,11 @@ class RemoteIOLoopKernelManager(KernelManager):
 
         # decide where to copy the connection file on the remote host
         try_ssh = Popen(['ssh', self.ip, 'exit'], stdin=PIPE, stdout=PIPE)
-        if try_ssh.wait() != 0:
-            raise RuntimeError("Failed to connect to remote host {0}"
-                               "".format(self.ip))
+        stdout, stderr = try_ssh.communicate()
+        if try_ssh.returncode != 0:
+            raise RuntimeError("Failed to connect to remote host {0}. "
+                               "stdout: '{1}' stdin: '{2}'"
+                               "".format(self.ip, stdout, stderr))
         remote_connection_file = os.path.join(
                 '~', '.ipython', 'kernels',
                 os.path.basename(self.connection_file))
@@ -80,14 +82,22 @@ class RemoteIOLoopKernelManager(KernelManager):
         # copy the connection file to the remote machine
         remote_connection_file_dir = os.path.dirname(remote_connection_file)
         mkdirp = Popen(['ssh', self.ip, 'mkdir', '-p', remote_connection_file_dir])
-        if mkdirp.wait() != 0:
+        stdout, stderr = mkdirp.communicate()
+        if mkdirp.returncode != 0:
             raise RuntimeError("Failed to create directory for connection "
-                               "file on remote host {0}".format(self.ip))
+                               "file at {0} on remote host {1}. "
+                               "stdout: '{2}' stdin: '{3}'"
+                               "".format(remote_connection_file_dir,
+                                         self.ip, stdout, stderr))
         transfer = Popen(['scp', self.connection_file,
                           '{0}:{1}'.format(self.ip, remote_connection_file)])
-        if transfer.wait() != 0:
-            raise RuntimeError("Failed to copy connection file to host {0}"
-                               "".format(self.ip))
+        stdout, stderr = transfer.communicate()
+        if transfer.returncode != 0:
+            raise RuntimeError("Failed to copy connection file into directory "
+                               "{0} on remote host {1}. "
+                               "stdout: '{2}' stdin: '{3}'"
+                               "".format(remote_connection_file_dir,
+                                         self.ip, stdout, stderr))
 
         # launch the kernel subprocess
         kernel_cmd[1 + kernel_cmd.index('-f')] = remote_connection_file

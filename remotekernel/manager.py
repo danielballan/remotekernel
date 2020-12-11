@@ -69,7 +69,8 @@ class RemoteIOLoopKernelManager(KernelManager):
         kernel_cmd = self.format_kernel_cmd(extra_arguments=extra_arguments)
 
         # decide where to copy the connection file on the remote host
-        try_ssh = Popen(['ssh', self.ip, 'exit'], stdin=PIPE, stdout=PIPE)
+        try_ssh = Popen(['ssh',  '-o', 'StrictHostKeyChecking no', self.ip, 'exit'],
+                        stdin=PIPE, stdout=PIPE)
         stdout, stderr = try_ssh.communicate()
         if try_ssh.returncode != 0:
             raise RuntimeError("Failed to connect to remote host {0}. "
